@@ -1,22 +1,38 @@
-.PHONY: cli app package clean test
+.PHONY: build release run test package install clean
 
-# CLI aracını derle
-cli:
-	go build -o youtube-extractor ./cmd/playlist
+APP_NAME = YouTube URL Extractor
+BINARY_NAME = YouTubeExtractor
 
-# Menu bar uygulamasını derle
-app:
-	go build -o YouTubeExtractor ./cmd/app
+# Debug build
+build:
+	swift build
 
-# macOS .app bundle oluştur
-package:
-	fyne package -os darwin -icon assets/icon.png -name "YouTube URL Extractor" -sourceDir ./cmd/app
+# Release build
+release:
+	swift build -c release
 
-# Derleme çıktılarını temizle
-clean:
-	rm -f youtube-extractor YouTubeExtractor
-	rm -rf "YouTube URL Extractor.app"
+# Debug modda çalıştır
+run: build
+	.build/debug/$(BINARY_NAME)
 
 # Testleri çalıştır
 test:
-	go test ./...
+	swift test
+
+# macOS .app bundle oluştur
+package: release
+	mkdir -p "$(APP_NAME).app/Contents/MacOS"
+	mkdir -p "$(APP_NAME).app/Contents/Resources"
+	cp .build/release/$(BINARY_NAME) "$(APP_NAME).app/Contents/MacOS/$(BINARY_NAME)"
+	cp Resources/Info.plist "$(APP_NAME).app/Contents/Info.plist"
+	codesign --force --sign - "$(APP_NAME).app"
+
+# /Applications'a kur
+install: package
+	cp -r "$(APP_NAME).app" "/Applications/$(APP_NAME).app"
+
+# Temizle
+clean:
+	swift package clean
+	rm -rf "$(APP_NAME).app"
+	rm -rf .build

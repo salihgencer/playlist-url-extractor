@@ -1,79 +1,79 @@
 # YouTube URL Extractor
 
-YouTube playlist URL'inden tüm video bağlantılarını çıkaran Go CLI aracı.
+YouTube playlist URL'inden tüm video bağlantılarını çıkaran native macOS menu bar uygulaması.
 
 ## Özellikler
 
-- 🎬 YouTube playlist'lerinden video ID'lerini çıkarır
-- 🔗 Tam video URL'lerini listeler
-- 🚀 Hızlı ve bağımlılık gerektirmez (pure Go)
-- ✅ Duplike video ID'lerini otomatik filtreler
+- macOS menu bar'da yaşar, Dock'ta görünmez
+- Popover arayüzü ile hızlı erişim
+- YouTube playlist'lerinden video URL'lerini çıkarır
+- Tekrarlanan video ID'lerini otomatik filtreler
+- Panoya kopyalama ve dosyaya kaydetme
+- Giriş'te otomatik başlatma (SMAppService)
+- SSRF korumalı URL doğrulama
 
 ## Gereksinimler
 
-- Go 1.21 veya üzeri
+- macOS 13 (Ventura) veya üzeri
+- Swift 5.10 veya üzeri
 
 ## Kurulum
 
 ```bash
 # Projeyi klonlayın
-git clone <repository-url>
+git clone https://github.com/salihgencer/youtube-url-extractor.git
 cd youtube-url-extractor
 
-# Derleyin
-go build -o youtube-extractor ./cmd/playlist
+# Derleyin ve kurun
+make install
 ```
 
-## Kullanım
+Bu komut `.app` bundle oluşturur ve `/Applications`'a kopyalar.
+
+## Geliştirme
 
 ```bash
-# Playlist URL'i ile çalıştırın
-./youtube-extractor "https://www.youtube.com/playlist?list=PLAYLIST_ID"
-```
+# Debug build
+make build
 
-### Örnek Çıktı
+# Debug modda çalıştır
+make run
 
-```
-https://www.youtube.com/watch?v=abc123def45
-https://www.youtube.com/watch?v=xyz987uvw65
-https://www.youtube.com/watch?v=qwe456rty78
-```
+# Testleri çalıştır
+make test
 
-### Doğrudan Çalıştırma (Derlemeden)
+# Release .app bundle oluştur
+make package
 
-```bash
-go run ./cmd/playlist "https://www.youtube.com/playlist?list=PLAYLIST_ID"
-```
-
-## Proje Yapısı
-
-```
-youtube-url-extractor/
-├── cmd/
-│   └── playlist/
-│       └── main.go           # CLI giriş noktası
-├── internal/
-│   ├── fetcher/
-│   │   └── fetcher.go        # HTTP istekleri ve HTML alma
-│   └── parser/
-│       ├── parser.go         # Video ID çıkarma mantığı
-│       └── parser_test.go    # Birim testleri
-├── go.mod
-└── README.md
-```
-
-## Testleri Çalıştırma
-
-```bash
-go test ./...
+# Temizle
+make clean
 ```
 
 ## Nasıl Çalışır?
 
-1. **Fetcher**: Verilen playlist URL'ine HTTP isteği gönderir
-2. **Parser**: HTML içindeki `ytInitialData` JavaScript objesini bulur
-3. **Extractor**: JSON verisi içinden `videoId` değerlerini regex ile çıkarır
-4. **Dedup**: Tekrarlanan video ID'lerini filtreler ve sonucu listeler
+1. Menu bar'daki ikona tıklayın
+2. YouTube playlist URL'sini yapıştırın (veya "Panodan Al" ile)
+3. "Çıkar" butonuna tıklayın
+4. Video URL'lerini kopyalayın veya dosyaya kaydedin
+
+## Proje Yapısı
+
+```
+Sources/
+├── YouTubeExtractor/main.swift          # Uygulama giriş noktası
+└── YouTubeExtractorLib/
+    ├── App.swift                        # NSApplication başlatma
+    ├── AppDelegate.swift                # Menu bar + Popover
+    ├── PopoverView.swift                # SwiftUI arayüz
+    ├── ExtractorViewModel.swift         # İş mantığı
+    ├── YouTubeFetcher.swift             # HTTP + URL doğrulama
+    ├── PlaylistParser.swift             # YouTube HTML parser
+    └── LaunchAtLogin.swift              # Login'de başlatma
+Tests/
+└── YouTubeExtractorTests/
+    ├── ParserTests.swift                # 11 test
+    └── FetcherTests.swift               # 10 test
+```
 
 ## Lisans
 
