@@ -1,4 +1,4 @@
-.PHONY: cli app package clean
+.PHONY: cli app package clean test
 
 # CLI aracını derle
 cli:

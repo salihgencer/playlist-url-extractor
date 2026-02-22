@@ -103,6 +103,9 @@ func sliceBalancedJSON(payload string) (string, error) {
 			braceCount++
 		case '}':
 			braceCount--
+			if braceCount < 0 {
+				return "", fmt.Errorf("JSON yapısı bozuk: fazladan kapanış parantezi")
+			}
 			if braceCount == 0 {
 				return builder.String(), nil
 			}

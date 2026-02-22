@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -25,7 +26,11 @@ func main() {
 
 	playlistURL := flag.Arg(0)
 
-	html, err := fetcher.FetchHTML(playlistURL)
+	if err := fetcher.ValidateURL(playlistURL); err != nil {
+		log.Fatalf("Geçersiz URL: %v", err)
+	}
+
+	html, err := fetcher.FetchHTML(context.Background(), playlistURL)
 	if err != nil {
 		log.Fatalf("HTML alınamadı: %v", err)
 	}

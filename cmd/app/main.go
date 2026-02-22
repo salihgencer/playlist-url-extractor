@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	_ "embed"
 	"fmt"
+	"image/color"
+	"log"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -15,7 +18,6 @@ import (
 	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"image/color"
 
 	"youtube-url-extractor/internal/fetcher"
 	"youtube-url-extractor/internal/parser"
@@ -53,6 +55,8 @@ func main() {
 
 	// --- Durum bilgisi ---
 	var videoURLs []string
+	// cancelFn aktif goroutine'i iptal etmek için kullanılır
+	var cancelFn context.CancelFunc
 
 	// --- UI bileşenleri ---
 
@@ -88,12 +92,18 @@ func main() {
 		statusLabel.Refresh()
 	}
 
-	// "Panodan Al" butonu
+	// "Panodan Al" butonu — clipboard içeriğini doğrula
 	pasteBtn := widget.NewButtonWithIcon("Panodan Al", theme.ContentPasteIcon(), func() {
-		content := w.Clipboard().Content()
-		if content != "" {
-			urlEntry.SetText(content)
+		content := strings.TrimSpace(w.Clipboard().Content())
+		if content == "" {
+			return
 		}
+		// Sadece YouTube URL'lerini kabul et
+		if err := fetcher.ValidateURL(content); err != nil {
+			setStatus("Panodaki içerik geçerli bir YouTube URL'si değil", true)
+			return
+		}
+		urlEntry.SetText(content)
 	})
 
 	// Alt butonlar (başlangıçta gizli olacak)
@@ -118,7 +128,8 @@ func main() {
 		}
 		d := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
 			if err != nil {
-				setStatus("Dosya kaydedilemedi: "+err.Error(), true)
+				setStatus("Dosya kaydedilemedi", true)
+				log.Printf("dosya kaydetme hatası: %v", err)
 				return
 			}
 			if writer == nil {
@@ -127,7 +138,8 @@ func main() {
 			defer writer.Close()
 			content := strings.Join(videoURLs, "\n") + "\n"
 			if _, err := writer.Write([]byte(content)); err != nil {
-				setStatus("Yazma hatası: "+err.Error(), true)
+				setStatus("Dosya yazılamadı", true)
+				log.Printf("dosya yazma hatası: %v", err)
 				return
 			}
 			setStatus("Dosya başarıyla kaydedildi", false)
@@ -148,6 +160,12 @@ func main() {
 			return
 		}
 
+		// URL doğrulama
+		if err := fetcher.ValidateURL(url); err != nil {
+			setStatus("Geçersiz URL: sadece YouTube playlist desteklenir", true)
+			return
+		}
+
 		// UI'ı "çalışıyor" durumuna getir
 		extractBtn.Disable()
 		setStatus("Video URL'leri çıkarılıyor...", false)
@@ -155,11 +173,18 @@ func main() {
 		statusLabel.Refresh()
 		bottomBar.Hide()
 
+		// İptal edilebilir context oluştur
+		ctx, cancel := context.WithCancel(context.Background())
+		cancelFn = cancel
+
 		go func() {
-			html, err := fetcher.FetchHTML(url)
+			defer cancel()
+
+			html, err := fetcher.FetchHTML(ctx, url)
 			if err != nil {
 				fyne.Do(func() {
-					setStatus("HTML alınamadı: "+err.Error(), true)
+					setStatus("HTML alınamadı, URL'yi kontrol edin", true)
+					log.Printf("fetch hatası: %v", err)
 					extractBtn.Enable()
 				})
 				return
@@ -168,7 +193,8 @@ func main() {
 			ids, err := parser.ExtractVideoIDs(html)
 			if err != nil {
 				fyne.Do(func() {
-					setStatus("Video bulunamadı: "+err.Error(), true)
+					setStatus("Video bulunamadı", true)
+					log.Printf("parse hatası: %v", err)
 					extractBtn.Enable()
 				})
 				return
@@ -188,6 +214,14 @@ func main() {
 			})
 		}()
 	}
+
+	// Uygulama kapanırken aktif goroutine'i iptal et
+	w.SetCloseIntercept(func() {
+		if cancelFn != nil {
+			cancelFn()
+		}
+		w.Hide()
+	})
 
 	// --- Düzen ---
 	// Üst satır: URL giriş + Panodan Al
