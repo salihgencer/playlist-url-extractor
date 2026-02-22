@@ -1,0 +1,28 @@
+# Swift / SPM
+.build/
+.swiftpm/
+*.app
+Package.resolved
+
+# Xcode
+*.xcodeproj
+*.xcworkspace
+xcuserdata/
+DerivedData/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug
+*.log
