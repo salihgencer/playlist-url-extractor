@@ -35,3 +35,7 @@ Thumbs.db
 *.aab
 *.dSYM.zip
 release-artifacts/
+
+# Kaydedilmiş YouTube sayfa dökümleri
+playlist_html_content.html
+*_html_content.html
