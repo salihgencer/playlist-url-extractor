@@ -90,8 +90,8 @@ describe("GET /playlist", () => {
     expect(calls[0]!.searchParams.get("pageToken")).toBe("CDIQAA");
   });
 
-  it("walks a 100-page playlist without hitting the per-IP limit", async () => {
-    const { call } = setup((url) => {
+  it("walks a 100-page playlist within the per-IP limit (300/min)", async () => {
+    const { call, limit } = setup((url) => {
       const page = Number(url.searchParams.get("pageToken")?.slice(1) ?? "0");
       if (url.pathname.endsWith("/playlists")) return { status: 200, body: { items: [] } };
       return {
@@ -101,7 +101,10 @@ describe("GET /playlist", () => {
           items: Array.from({ length: 50 }, (_, i) => item(`v${String(page).padStart(3, "0")}_${String(i).padStart(5, "0")}`, "x")),
         },
       };
-    });
+    }, { limiter: true });
+    // wrangler.jsonc'deki sınırı taklit eden sayaçlı limiter.
+    let used = 0;
+    limit.mockImplementation(async () => ({ success: ++used <= 300 }));
     let token: string | null = null;
     let total = 0;
     for (let i = 0; i < 101; i++) {
@@ -113,6 +116,7 @@ describe("GET /playlist", () => {
       if (!token) break;
     }
     expect(total).toBe(5000);
+    expect(used).toBe(100);
   });
 
   it("never leaks the API key in any response", async () => {

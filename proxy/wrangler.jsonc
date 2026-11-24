@@ -32,8 +32,8 @@
       "simple": { "limit": 300, "period": 60 }
     }
   ],
+  // Gizlilik: istek günlükleri (URL, IP) tutulmaz. Hata ayıklama gerekirse geçici olarak açılır.
   "observability": {
-    "enabled": true,
-    "logs": { "head_sampling_rate": 0.1 }
+    "enabled": false
   }
 }

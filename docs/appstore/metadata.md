@@ -5,7 +5,7 @@ ASC app 6797833220 · bundle `com.salihgencer.PlaylistURLExtractor` · macOS · 
 Kurallar (5.2.1 / 5.2.2 riskini azaltmak için):
 - Uygulama adı, alt başlık ve anahtar kelimelerde "YouTube" geçmez.
 - Açıklamada YouTube yalnız uyumluluğu anlatmak için ve bağlantısızlık beyanıyla geçer.
-- İkon ve ekran görüntülerinde kırmızı veya oynat üçgeni yok; ekran görüntülerindeki veri kurgusal örnek listedir (12 video, ID'ler gerçek değil).
+- İkon ve ekran görüntülerinde kırmızı veya oynat üçgeni yok; ekran görüntülerindeki veri kurgusal örnek listedir (12 video, ID'ler gerçek değil; 3. görüntüdeki liste kimliği de kurgusal).
 
 ---
 
@@ -113,7 +113,6 @@ How to test:
    (or just the ID: PLOU2XLYxmsIIAOskSyap13n9W-xOt_GP5)
 3. Click "Extract Links". The playlist title and every video link appear.
 4. Click "Copy All" (links are copied to the clipboard) or "Save as Text File…" (a save panel lets you choose the location; the app is sandboxed and only writes where you choose).
-Optional — a long playlist that exercises paging (official channel uploads): UU_x5XG1OV2P6uZZ5FSM9Ttw
 Optional — error handling: enter "PLdoesnotexist000" to see the "Playlist not found" message.
 
 No account, login or in-app purchase is required. No personal data is collected.

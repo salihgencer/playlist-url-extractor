@@ -1,4 +1,5 @@
 import AppKit
+import OSLog
 import SwiftUI
 
 /// Menü çubuğu öğesi ve popover'ı yönetir.
@@ -9,6 +10,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private let viewModel: ExtractorViewModel
 
     private static let hasLaunchedKey = "hasLaunchedBefore"
+    private let logger = Logger(subsystem: "com.salihgencer.PlaylistURLExtractor", category: "app")
 
     public init(viewModel: ExtractorViewModel) {
         self.viewModel = viewModel
@@ -38,7 +40,8 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         let defaults = UserDefaults.standard
         if !defaults.bool(forKey: Self.hasLaunchedKey) {
             defaults.set(true, forKey: Self.hasLaunchedKey)
-            DispatchQueue.main.async { [weak self] in self?.showPopover() }
+            // Durum öğesinin penceresi yerleşsin diye kısa gecikme.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in self?.showPopover() }
         }
     }
 
@@ -54,7 +57,8 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func showPopover() {
         guard let button = statusItem.button, !popover.isShown else { return }
-        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
         NSApp.activate(ignoringOtherApps: true)
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+        logger.info("popover shown=\(self.popover.isShown, privacy: .public) buttonWindow=\(button.window != nil, privacy: .public)")
     }
 }

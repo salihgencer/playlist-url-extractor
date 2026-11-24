@@ -25,7 +25,7 @@ public enum PlaylistError: Error, Equatable, LocalizedError {
         case .unsupportedPlaylist:
             return L10n.string("Mixes, Watch Later and Liked lists can't be listed. Try a regular public playlist.")
         case .notFound:
-            return L10n.string("Playlist not found. It may have been deleted, or the link is incomplete.")
+            return L10n.string("Playlist not found. It may be private or deleted, or the link may be incomplete.")
         case .privatePlaylist:
             return L10n.string("This playlist is private. Only public and unlisted playlists can be listed.")
         case .quotaExceeded:

@@ -32,8 +32,8 @@ TR = {
         "Bu bağlantıda oynatma listesi yok. “list=” içeren bir bağlantı kullanın.",
     "Mixes, Watch Later and Liked lists can't be listed. Try a regular public playlist.":
         "Karışımlar, Daha Sonra İzle ve Beğenilenler listelenemez. Normal, herkese açık bir oynatma listesi deneyin.",
-    "Playlist not found. It may have been deleted, or the link is incomplete.":
-        "Oynatma listesi bulunamadı. Silinmiş olabilir veya bağlantı eksik.",
+    "Playlist not found. It may be private or deleted, or the link may be incomplete.":
+        "Oynatma listesi bulunamadı. Gizli veya silinmiş olabilir ya da bağlantı eksik olabilir.",
     "This playlist is private. Only public and unlisted playlists can be listed.":
         "Bu oynatma listesi gizli. Yalnızca herkese açık ve liste dışı oynatma listeleri listelenebilir.",
     "The daily lookup limit has been reached. Please try again tomorrow.":

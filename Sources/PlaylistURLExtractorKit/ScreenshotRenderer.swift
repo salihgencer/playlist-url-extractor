@@ -11,7 +11,7 @@ import UniformTypeIdentifiers
 @MainActor
 enum ScreenshotRenderer {
     private static let canvas = CGSize(width: 2880, height: 1800)
-    private static let privateLink = "https://www.youtube.com/playlist?list=PLprivateTeamNotes"
+    private static let privateLink = "https://www.youtube.com/playlist?list=PLteamNotesArchive"
     private static let sampleLink = "https://www.youtube.com/playlist?list=\(SamplePlaylistSource.playlistID)"
 
     static func runIfRequested() -> Bool {
@@ -35,7 +35,7 @@ enum ScreenshotRenderer {
                     ("2-copy", .copied(playlist.videos.count), playlist,
                      L10n.string("Copy or save the whole list"),
                      L10n.string("Copy all links to the clipboard or save them as a plain text file.")),
-                    ("3-errors", .failure(.privatePlaylist), nil,
+                    ("3-errors", .failure(.notFound), nil,
                      L10n.string("Clear messages when something's wrong"),
                      L10n.string("Private, deleted or unsupported playlists are explained in plain words.")),
                 ]

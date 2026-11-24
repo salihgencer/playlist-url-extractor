@@ -323,12 +323,12 @@
         }
       }
     },
-    "Playlist not found. It may have been deleted, or the link is incomplete.": {
+    "Playlist not found. It may be private or deleted, or the link may be incomplete.": {
       "localizations": {
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Oynatma listesi bulunamadı. Silinmiş olabilir veya bağlantı eksik."
+            "value": "Oynatma listesi bulunamadı. Gizli veya silinmiş olabilir ya da bağlantı eksik olabilir."
           }
         }
       }
