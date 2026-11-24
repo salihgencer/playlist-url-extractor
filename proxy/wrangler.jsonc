@@ -1,0 +1,39 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Playlist URL Extractor (macOS) için YouTube Data API v3 vekili.
+  // API anahtarı uygulamada değil, burada secret olarak durur: `wrangler secret put YT_API_KEY`.
+  "name": "playlist-url-extractor-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-13",
+  // workers_dev: custom route sorunlu olursa yedek/deneme adresi.
+  "workers_dev": true,
+  // api.salihgencer.com host'u kahve-fali-api Worker'ında custom domain olarak bağlı;
+  // bu Worker yalnız /playlist-url-extractor/* yolunu path route ile alır
+  // (kahve-fali/backend/wrangler.jsonc'deki not). Deploy sonrası curl ile doğrula.
+  "routes": [
+    {
+      "pattern": "api.salihgencer.com/playlist-url-extractor/*",
+      "zone_name": "salihgencer.com"
+    }
+  ],
+  "secrets": {
+    "required": ["YT_API_KEY"]
+  },
+  "vars": {
+    // Başarılı sayfa yanıtlarının edge önbellek süresi (saniye). Hata yanıtları önbelleğe alınmaz.
+    // YouTube API politikası (III.E.4) 30 günden uzun saklamaya izin vermez; 10 dk çok altında.
+    "CACHE_TTL_SECONDS": "600"
+  },
+  // IP başına dakikada 300 istek: 5000 öğelik bir liste (100 sayfa) tek seferde rahat geçer.
+  "ratelimits": [
+    {
+      "name": "RATE_LIMITER",
+      "namespace_id": "4101",
+      "simple": { "limit": 300, "period": 60 }
+    }
+  ],
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 0.1 }
+  }
+}

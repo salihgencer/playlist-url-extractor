@@ -1,3 +1,0 @@
-import YouTubeExtractorLib
-
-startApp()

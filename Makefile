@@ -1,38 +1,46 @@
-.PHONY: build release run test package install clean
+.PHONY: build test run xcode archive screenshots icon strings proxy-test clean
 
-APP_NAME = YouTube URL Extractor
-BINARY_NAME = YouTubeExtractor
+SCHEME = PlaylistURLExtractor
+DERIVED = .build/xcode
+ARCHIVE = .build/PlaylistURLExtractor.xcarchive
 
-# Debug build
+# Swift paketi (geliştirme)
 build:
 	swift build
 
-# Release build
-release:
-	swift build -c release
-
-# Debug modda çalıştır
-run: build
-	.build/debug/$(BINARY_NAME)
-
-# Testleri çalıştır
 test:
 	swift test
 
-# macOS .app bundle oluştur
-package: release
-	mkdir -p "$(APP_NAME).app/Contents/MacOS"
-	mkdir -p "$(APP_NAME).app/Contents/Resources"
-	cp .build/release/$(BINARY_NAME) "$(APP_NAME).app/Contents/MacOS/$(BINARY_NAME)"
-	cp Resources/Info.plist "$(APP_NAME).app/Contents/Info.plist"
-	codesign --force --sign - "$(APP_NAME).app"
+run:
+	swift run PlaylistURLExtractorDev
 
-# /Applications'a kur
-install: package
-	cp -r "$(APP_NAME).app" "/Applications/$(APP_NAME).app"
+# Xcode projesini üret (xcodegen; .xcodeproj git'e girmez)
+xcode:
+	xcodegen generate
 
-# Temizle
+# App Store arşivi (imzalı; Xcode'da A6R928V6HS hesabı gerekir)
+archive: xcode
+	xcodebuild archive -project $(SCHEME).xcodeproj -scheme $(SCHEME) -configuration Release \
+		-archivePath $(ARCHIVE) -derivedDataPath $(DERIVED)
+
+# 2880x1800 App Store ekran görüntüleri (DEBUG derleme, ağsız örnek veri) → docs/appstore/screenshots
+screenshots: xcode
+	xcodebuild build -project $(SCHEME).xcodeproj -scheme $(SCHEME) -configuration Debug \
+		-derivedDataPath $(DERIVED) CODE_SIGNING_ALLOWED=NO
+	for l in en tr; do \
+		"$(DERIVED)/Build/Products/Debug/Playlist URL Extractor.app/Contents/MacOS/Playlist URL Extractor" \
+			-RenderScreenshots "$(CURDIR)/docs/appstore/screenshots" -AppleLanguages "($$l)" -AppleLocale $$l; \
+	done
+
+icon:
+	swift scripts/make_icon.swift
+
+strings:
+	python3 scripts/gen_strings.py
+
+proxy-test:
+	cd proxy && npm ci && npm run check
+
 clean:
 	swift package clean
-	rm -rf "$(APP_NAME).app"
-	rm -rf .build
+	rm -rf .build $(SCHEME).xcodeproj
