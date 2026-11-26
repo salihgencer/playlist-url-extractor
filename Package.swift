@@ -2,22 +2,29 @@
 import PackageDescription
 
 let package = Package(
-    name: "YouTubeExtractor",
+    name: "PlaylistURLExtractor",
+    defaultLocalization: "en",
     platforms: [.macOS(.v13)],
+    products: [
+        // Xcode uygulama hedefi (project.yml) bu ürünü bağlar.
+        .library(name: "PlaylistURLExtractorKit", targets: ["PlaylistURLExtractorKit"])
+    ],
     targets: [
         .target(
-            name: "YouTubeExtractorLib",
-            path: "Sources/YouTubeExtractorLib"
+            name: "PlaylistURLExtractorKit",
+            path: "Sources/PlaylistURLExtractorKit",
+            resources: [.process("Resources")]
         ),
+        // Yalnız geliştirme: `swift run PlaylistURLExtractorDev`. App Store derlemesi Xcode projesinden.
         .executableTarget(
-            name: "YouTubeExtractor",
-            dependencies: ["YouTubeExtractorLib"],
-            path: "Sources/YouTubeExtractor"
+            name: "PlaylistURLExtractorDev",
+            dependencies: ["PlaylistURLExtractorKit"],
+            path: "Sources/PlaylistURLExtractorDev"
         ),
         .testTarget(
-            name: "YouTubeExtractorTests",
-            dependencies: ["YouTubeExtractorLib"],
-            path: "Tests/YouTubeExtractorTests"
+            name: "PlaylistURLExtractorKitTests",
+            dependencies: ["PlaylistURLExtractorKit"],
+            path: "Tests/PlaylistURLExtractorKitTests"
         )
     ]
 )

@@ -1,80 +1,36 @@
-# YouTube URL Extractor
+# Playlist URL Extractor
 
-YouTube playlist URL'inden tüm video bağlantılarını çıkaran native macOS menu bar uygulaması.
+Herkese açık bir oynatma listesindeki tüm video bağlantılarını listeleyen native macOS menü çubuğu uygulaması (Mac App Store, macOS 13+).
 
-## Özellikler
-
-- macOS menu bar'da yaşar, Dock'ta görünmez
-- Popover arayüzü ile hızlı erişim
-- YouTube playlist'lerinden video URL'lerini çıkarır
-- Tekrarlanan video ID'lerini otomatik filtreler
-- Panoya kopyalama ve dosyaya kaydetme
-- Giriş'te otomatik başlatma (SMAppService)
-- SSRF korumalı URL doğrulama
-
-## Gereksinimler
-
-- macOS 13 (Ventura) veya üzeri
-- Swift 5.10 veya üzeri
-
-## Kurulum
-
-```bash
-# Projeyi klonlayın
-git clone https://github.com/salihgencer/youtube-url-extractor.git
-cd youtube-url-extractor
-
-# Derleyin ve kurun
-make install
-```
-
-Bu komut `.app` bundle oluşturur ve `/Applications`'a kopyalar.
+- Veri kaynağı: resmi **YouTube Data API v3** (`playlistItems.list`, sayfalama ile tüm öğeler). HTML kazıma yok.
+- API anahtarı uygulamada **yok**: istekler `proxy/` altındaki Cloudflare Worker'dan geçer
+  (`https://api.salihgencer.com/playlist-url-extractor/playlist?id=…`), anahtar Worker secret'ı `YT_API_KEY`.
+- Video indirmez; yalnızca bağlantıları kopyalar veya `.txt` olarak kaydeder.
+- İngilizce + Türkçe (String Catalog).
 
 ## Geliştirme
 
 ```bash
-# Debug build
-make build
-
-# Debug modda çalıştır
-make run
-
-# Testleri çalıştır
-make test
-
-# Release .app bundle oluştur
-make package
-
-# Temizle
-make clean
+swift test                 # Swift birim testleri
+swift run PlaylistURLExtractorDev   # geliştirme için menü çubuğu uygulaması
+make xcode                 # xcodegen → PlaylistURLExtractor.xcodeproj (git'e girmez)
+make archive               # imzalı App Store arşivi
+make screenshots           # docs/appstore/screenshots (2880x1800, en+tr)
+make icon                  # docs/appstore/icon-1024.png + App/Assets.xcassets/AppIcon
+make strings               # Localizable.xcstrings'i scripts/gen_strings.py'den üret
+make proxy-test            # Worker: typecheck + vitest + wrangler dry-run
 ```
 
-## Nasıl Çalışır?
-
-1. Menu bar'daki ikona tıklayın
-2. YouTube playlist URL'sini yapıştırın (veya "Panodan Al" ile)
-3. "Çıkar" butonuna tıklayın
-4. Video URL'lerini kopyalayın veya dosyaya kaydedin
-
-## Proje Yapısı
+## Yapı
 
 ```
-Sources/
-├── YouTubeExtractor/main.swift          # Uygulama giriş noktası
-└── YouTubeExtractorLib/
-    ├── App.swift                        # NSApplication başlatma
-    ├── AppDelegate.swift                # Menu bar + Popover
-    ├── PopoverView.swift                # SwiftUI arayüz
-    ├── ExtractorViewModel.swift         # İş mantığı
-    ├── YouTubeFetcher.swift             # HTTP + URL doğrulama
-    ├── PlaylistParser.swift             # YouTube HTML parser
-    └── LaunchAtLogin.swift              # Login'de başlatma
-Tests/
-└── YouTubeExtractorTests/
-    ├── ParserTests.swift                # 11 test
-    └── FetcherTests.swift               # 10 test
+App/                         Xcode uygulama hedefi (main.swift, Info.plist, entitlements, ikon, PrivacyInfo)
+project.yml                  xcodegen tanımı (2.0.0 / build 4, sandbox, LSUIElement)
+Sources/PlaylistURLExtractorKit/   Uygulama mantığı + SwiftUI arayüz (SwiftPM kütüphanesi)
+Sources/PlaylistURLExtractorDev/   `swift run` girişi
+Tests/PlaylistURLExtractorKitTests/
+proxy/                       Cloudflare Worker (YouTube Data API vekili)
+docs/appstore/               ASC metadata taslağı, ikon kaynağı, ekran görüntüleri
 ```
 
-## Lisans
-
-MIT License
+Bağımsız bir uygulamadır; YouTube veya Google ile bağlantılı değildir. MIT License.

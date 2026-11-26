@@ -1,0 +1,27 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleDisplayName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Playlist URL Extractor" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Playlist URL Extractor" } }
+      }
+    },
+    "CFBundleName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Playlist URL Extractor" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "Playlist URL Extractor" } }
+      }
+    },
+    "NSHumanReadableCopyright" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "© 2026 Salih Gencer" } },
+        "tr" : { "stringUnit" : { "state" : "translated", "value" : "© 2026 Salih Gencer" } }
+      }
+    }
+  },
+  "version" : "1.0"
+}
